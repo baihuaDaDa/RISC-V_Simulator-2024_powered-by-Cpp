@@ -8,9 +8,14 @@ namespace riscv {
 
     class ALU {
     public:
+        ui result;
+    private:
+        ui result_next;
+
+    public:
         ALU();
 
-        void execute(ui ir, RS2ALU &input);
+        void execute(RS2ALU &input);
 
         void flush();
 

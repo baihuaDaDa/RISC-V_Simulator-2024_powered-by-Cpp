@@ -1,24 +1,23 @@
 #ifndef RISC_V_SIMULATOR_DECODER_HPP
 #define RISC_V_SIMULATOR_DECODER_HPP
 
-#include "CommonDataBus.hpp"
-#include "ControlUnit.hpp"
 #include "ReorderBuffer.hpp"
-#include "ReservationStation.hpp"
+#include "RegisterFile.hpp"
 
 namespace riscv {
 
     class Decoder {
     public:
         Decoder2RoB toRoB;
-        bool isRoB;
         Decoder2RS toRS;
-        bool isRS;
         Decoder2LSB toLSB;
-        bool isLSB;
+    private:
+        Decoder2RoB toRoB_next;
+        Decoder2RS toRS_next;
+        Decoder2LSB toLSB_next;
 
     private:
-        void func_lui();
+        void func_lui(ui ir, ReorderBuffer &rob, RegisterFile &regFile);
 
         void func_auipc();
 
@@ -43,7 +42,7 @@ namespace riscv {
 
         void flush();
 
-        void execute(ui ir);
+        void execute(ui ir, ReorderBuffer &rob, RegisterFile &regFile);
 
     };
 

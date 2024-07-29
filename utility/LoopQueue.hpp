@@ -6,35 +6,48 @@
 
 namespace riscv {
 
-    const ui kMaxQueue = 100;
+    const ui kMaxQueue = 64;
+    const ui kMaxQueueBin = 6;
 
     template<class T>
     class LoopQueue {
     private:
-        T data[kMaxQueue];
+        T data[kMaxQueue]{};
         ui head = 0, rear = 0, size_ = 0;
 
     public:
         LoopQueue() = default;
 
+        LoopQueue &operator=(LoopQueue &rhs) {
+            if (this == &rhs) return *this;
+            for (ui i = (rhs.head + 1) >> kMaxQueueBin; rhs.head != rhs.rear; i = (i + 1) >> kMaxQueueBin) {
+                data[i] = rhs.data[i];
+                if (i == rhs.rear) break;
+            }
+            head = rhs.head;
+            rear = rhs.rear;
+            size_ = rhs.size_;
+            return *this;
+        }
+
         void push_back(const T &t) {
-            rear = (rear + 1) %kMaxQueue;
+            rear = (rear + 1) >> kMaxQueueBin;
             data[rear] = t;
         }
 
         void pop_front() {
-            head = (head + 1) % kMaxQueue;
+            head = (head + 1) >> kMaxQueueBin;
         }
 
         T front() const {
-            return data[(head + 1) % kMaxQueue];
+            return data[(head + 1) >> kMaxQueueBin];
         }
 
         T back() const {
             return data[rear];
         }
 
-        T size() const {
+        ui size() const {
             return size_;
         }
 
@@ -47,8 +60,21 @@ namespace riscv {
         }
 
         T &operator[](ui ind) const {
-            return data[(ind + head + 1) % kMaxQueue];
+            return data[(ind + head + 1) >> kMaxQueueBin];
         }
+
+        T &at(ui id) const {
+            return data[id];
+        }
+
+        ui front_identity() const {
+            return (head + 1) >> kMaxQueueBin;
+        }
+
+        ui back_identity() const {
+            return rear;
+        }
+
     };
 
 }

@@ -2,18 +2,18 @@
 
 namespace riscv {
     
-    Decoder::Decoder() {}
+    Decoder::Decoder() = default;
 
     void Decoder::flush() {}
 
-    void Decoder::execute(ui ir) {
+    void Decoder::execute(ui ir, ReorderBuffer &rob, RegisterFile &regFile) {
         if (ir == 0x0ff00513) {
             func_exit();
             return;
         }
         switch (ir & 1111111) {
             case 0110111:
-                func_lui();
+                func_lui(ir, rob, regFile);
                 break;
             case 0010111:
                 func_auipc();
@@ -42,27 +42,8 @@ namespace riscv {
         }
     }
 
-    void Decoder::func_lui() {
-        if ()
+    void Decoder::func_lui(ui ir, ReorderBuffer &rob, RegisterFile &regFile) {
+        toRoB_next
     }
-
-    void Decoder::func_auipc() {
-    }
-
-    void Decoder::func_jal() {}
-
-    void Decoder::func_jalr() {}
-
-    void Decoder::func_branch() {}
-
-    void Decoder::func_load() {}
-
-    void Decoder::func_store() {}
-
-    void Decoder::func_calc() {}
-
-    void Decoder::func_calc_imm() {}
-
-    void Decoder::func_exit() {}
 
 } // riscv
