@@ -6,11 +6,10 @@
 
 namespace riscv {
 
-    const ui kMaxQueue = 64;
-    const ui kMaxQueueBin = 6;
-
-    template<class T>
+    template<class T, ui kMaxQueueBin>
     class LoopQueue {
+    public:
+        static constexpr ui kMaxQueue = 1 << kMaxQueueBin;
     private:
         T data[kMaxQueue]{};
         ui head = 0, rear = 0, size_ = 0;
@@ -39,11 +38,19 @@ namespace riscv {
             head = (head + 1) >> kMaxQueueBin;
         }
 
-        T front() const {
+        T &front() {
             return data[(head + 1) >> kMaxQueueBin];
         }
 
-        T back() const {
+        const T &front() const {
+            return data[(head + 1) >> kMaxQueueBin];
+        }
+
+        T &back() {
+            return data[rear];
+        }
+
+        const T &back() const {
             return data[rear];
         }
 
@@ -59,7 +66,7 @@ namespace riscv {
             return size_ == kMaxQueue - 1;
         }
 
-        T &operator[](ui ind) const {
+        T &operator[](ui ind) {
             return data[(ind + head + 1) >> kMaxQueueBin];
         }
 

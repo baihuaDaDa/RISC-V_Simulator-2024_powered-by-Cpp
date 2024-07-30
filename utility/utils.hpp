@@ -4,11 +4,11 @@
 namespace riscv {
     using ui = unsigned int;
     const ui kWordLen = 4;
-    ui sext(ui num, ui highest) {
+    constexpr ui sext(ui num, ui highest) {
         if (num & (1 << highest)) return num + (((1 << (31 - highest)) - 1) << highest);
         return num;
     }
-    ui upper_sext(ui num, ui lowest) {
+    constexpr ui upper_sext(ui num, ui lowest) {
         return num << lowest;
     }
 }

@@ -16,7 +16,7 @@ namespace riscv {
 
     void ReorderBuffer::execute(Decoder2RoB &toRoB) {
         if (toRoB.ready) add(toRoB);
-        auto top = buffer.front();
+        auto &top = buffer.front();
         if (top.state == WRITE_RESULT) {
             switch (top.robType) {
                 case RoB_REG:

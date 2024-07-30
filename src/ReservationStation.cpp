@@ -5,20 +5,59 @@ namespace riscv {
     ReservationStation::ReservationStation() = default;
 
     void ReservationStation::add(Decoder2RS &toRS) {
-        if (station.full()) throw "RS full.";
-        station_next.push_back(RSEntry{toRS, true});
+        int tar = -1;
+        for (int i = 0; i < kStationSize; i++) {
+            if (!station[i].busy) {
+                tar = i;
+                break;
+            }
+        }
+        if (tar == -1) throw "RS full.";
+        station_next[tar] = RSEntry{toRS, true};
     }
 
-    void ReservationStation::execute(Decoder2RS &toRS) {
-        if (toRS.ready) add(toRS);
+    void ReservationStation::update_dependency(ui value, ui robId) {
+        for (int i = 0; i < kStationSize; i++) {
+            if (station[i].busy) {
+                if (station[i].Qj == robId) {
+                    station_next[i].Vj = value;
+                    station_next[i].Qj = -1;
+                }
+                if (station[i].Qk == robId) {
+                    station_next[i].Vk = value;
+                    station_next[i].Qk = -1;
+                }
+            }
+        }
+    }
 
+    void ReservationStation::execute(Decoder2RS &fromDec, LSB2RS &fromLSB, ALUResult &fromALU, MemResult &fromMem) {
+        if (fromDec.ready) add(fromDec);
+        if (fromLSB.ready) update_dependency(fromLSB.value, fromLSB.robId);
+        if (fromMem.ready) update_dependency(fromMem.value, fromMem.robId);
+        if (fromALU.ready) update_dependency(fromALU.value, fromALU.robId);
+        for (int i = 0; i < kStationSize; i++) {
+            if (station[i].busy) {
+                if (station[i].Qj == -1 && station[i].Qk == -1) {
+                    station_next[i].busy = false;
+                    toALU_next = RS2ALU{station[i].calcType, station[i].Vj, station[i].Vk, station[i].robId, true};
+                    return;
+                }
+            }
+        }
     }
 
     void ReservationStation::flush() {
+        station = station_next;
+        toALU = toALU_next;
+        toALU_next.ready = false;
     }
 
     bool ReservationStation::full() const {
-        return station.full();
+        bool full = true;
+        for (int i = 0; i < kStationSize; i++)
+            if (!station[i].busy) full = false;
+        return full;
     }
 
 } // riscv

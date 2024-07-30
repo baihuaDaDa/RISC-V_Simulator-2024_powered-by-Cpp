@@ -4,46 +4,60 @@ namespace riscv {
     
     Decoder::Decoder() = default;
 
-    void Decoder::flush() {}
+    void Decoder::flush() {
+        toRoB = toRoB_next;
+        toRoB_next.ready = false;
+        toRS = toRS_next;
+        toRS_next.ready = false;
+        toLSB = toLSB_next;
+        toLSB_next.ready = false;
+    }
 
-    void Decoder::execute(ui ir, ReorderBuffer &rob, RegisterFile &regFile) {
-        if (ir == 0x0ff00513) {
-            func_exit();
-            return;
-        }
-        switch (ir & 1111111) {
-            case 0110111:
-                func_lui(ir, rob, regFile);
-                break;
-            case 0010111:
-                func_auipc();
-                break;
-            case 1101111:
-                func_jal();
-                break;
-            case 1100111:
-                func_jalr();
-                break;
-            case 1100011:
-                func_branch();
-                break;
-            case 0000011:
-                func_load();
-                break;
-            case 0100011:
-                func_store();
-                break;
-            case 0010011:
-                func_calc_imm();
-                break;
-            case 0110011:
-                func_calc();
-                break;
+    void Decoder::execute(ui pc, CU2Decoder &toDecoder, ReorderBuffer &rob, RegisterFile &regFile) {
+        switch (toDecoder.op) {
+            case LUI: func_lui(pc, toDecoder, rob, regFile); break;
+            case AUIPC: func_auipc(pc, toDecoder, rob, regFile); break;
+            case JAL: func_jal(pc, toDecoder, rob, regFile); break;
+            case JALR: func_jalr(pc, toDecoder, rob, regFile); break;
+            case BEQ:
+            case BNE:
+            case BLT:
+            case BGE:
+            case BLTU:
+            case BGEU: func_branch(pc, toDecoder, rob, regFile); break;
+            case LB:
+            case LH:
+            case LW:
+            case LBU:
+            case LHU: func_load(pc, toDecoder, rob, regFile); break;
+            case SB:
+            case SH:
+            case SW: func_store(pc, toDecoder, rob, regFile); break;
+            case ADDI:
+            case SLTI:
+            case SLTIU:
+            case XORI:
+            case ORI:
+            case ANDI:
+            case SLLI:
+            case SRLI:
+            case SRAI: func_calc_imm(pc, toDecoder, rob, regFile); break;
+            case ADD:
+            case SUB:
+            case SLL:
+            case SLT:
+            case SLTU:
+            case XOR:
+            case SRL:
+            case SRA:
+            case OR:
+            case AND: func_calc(pc, toDecoder, rob, regFile); break;
+            case EXIT: func_exit(pc, toDecoder, rob, regFile);
         }
     }
 
-    void Decoder::func_lui(ui ir, ReorderBuffer &rob, RegisterFile &regFile) {
-        toRoB_next
+    void Decoder::func_lui(ui pc, CU2Decoder &toDecoder, ReorderBuffer &rob, RegisterFile &regFile) {
+        toRoB_next = {}
     }
 
 } // riscv

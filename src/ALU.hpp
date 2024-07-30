@@ -2,20 +2,19 @@
 #define RISC_V_SIMULATE_ALU_HPP
 
 #include "CommonDataBus.hpp"
-#include "ControlUnit.hpp"
 
 namespace riscv {
 
     class ALU {
     public:
-        ui result;
+        ALUResult result;
     private:
-        ui result_next;
+        ALUResult result_next;
 
     public:
         ALU();
 
-        void execute(RS2ALU &input);
+        void execute(RS2ALU &fromRS);
 
         void flush();
 

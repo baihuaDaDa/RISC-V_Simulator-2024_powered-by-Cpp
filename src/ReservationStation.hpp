@@ -1,6 +1,7 @@
 #ifndef RISC_V_SIMULATOR_RESERVATIONSTATION_HPP
 #define RISC_V_SIMULATOR_RESERVATIONSTATION_HPP
 
+#include <array>
 #include "../utility/LoopQueue.hpp"
 #include "CommonDataBus.hpp"
 
@@ -8,32 +9,34 @@ namespace riscv {
 
     struct RSEntry {
         CalcType calcType;
-        ui Qj, Qk, Vj, Vk, dest, imm;
+        ui Qj, Qk, Vj, Vk;
         ui robId;
-        bool busy;
+        bool busy = false;
 
         RSEntry() = default;
 
         RSEntry(const Decoder2RS &toRS, bool busy_) : calcType(toRS.calcType), Qj(toRS.Qj), Qk(toRS.Qk), Vj(toRS.Vj),
-                                                      Vk(toRS.Vk), dest(toRS.dest), imm(toRS.imm), robId(toRS.robId),
-                                                      busy(busy_) {}
+                                                      Vk(toRS.Vk), robId(toRS.robId), busy(busy_) {}
     };
 
     class ReservationStation {
     private:
-        LoopQueue<RSEntry> station_next;
+        static constexpr ui kStationSize = 16;
+        std::array<RSEntry, kStationSize> station_next;
         RS2ALU toALU_next;
     public:
-        LoopQueue<RSEntry> station;
-        RS2ALU toaLU;
+        std::array<RSEntry, kStationSize> station;
+        RS2ALU toALU;
 
     private:
         void add(Decoder2RS &toRS);
 
+        void update_dependency(ui value, ui robId);
+
     public:
         ReservationStation();
 
-        void execute(Decoder2RS &toRS);
+        void execute(Decoder2RS &fromDec, LSB2RS &fromLSB, ALUResult &fromALU, MemResult &fromMem);
 
         void flush();
 

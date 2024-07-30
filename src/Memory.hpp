@@ -6,33 +6,45 @@
 #include <iostream>
 #include <string>
 #include <sstream>
-#include <cstdint>
 
 namespace riscv {
     class Memory {
+    public:
+        MemResult result;
+        bool busy = false;
     private:
+        ui clock = 0;
         std::unordered_map<ui, unsigned char> memory;
+        MemResult result_next;
+
+    private:
+        void load_byte(LSB2Mem &fromLSB);
+
+        void load_half(LSB2Mem &fromLSB);
+
+        void load_word(LSB2Mem &fromLSB);
+
+        void load_byte_unsigned(LSB2Mem &fromLSB);
+
+        void load_half_unsigned(LSB2Mem &fromLSB);
+
+        void store_byte(RoB2Mem &fromRoB);
+
+        void store_half(RoB2Mem &fromRoB);
+
+        void store_word(RoB2Mem &fromRoB);
 
     public:
         Memory();
 
-        void load_program(std::istream &is);
+        void store_program(std::istream &is);
 
-        ui load_byte(ui addr);
+        void load_instruction(ui pc);
 
-        ui load_half(ui addr);
+        void execute(RoB2Mem &fromRoB, LSB2Mem &fromLSB);
 
-        ui load_word(ui addr);
+        void flush();
 
-        ui load_byte_unsigned(ui addr);
-
-        ui load_half_unsigned(ui addr);
-
-        void store_byte(ui addr, ui operand);
-
-        void store_half(ui addr, ui operand);
-
-        void store_word(ui addr, ui operand);
     };
 }
 

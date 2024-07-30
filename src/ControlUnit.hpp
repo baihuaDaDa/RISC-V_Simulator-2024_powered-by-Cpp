@@ -9,12 +9,23 @@ namespace riscv {
     class ControlUnit {
     public:
         ui pc;
-        ui ir;
-        bool ready;
+        CU2Decoder toDec;
     private:
+        static constexpr ui kSubOpcode = 0x7000;
+        static constexpr ui kImm_31_12 = 0xFFFFF000;
+        static constexpr ui kImm_31_20 = 0xFFF00000;
+        static constexpr ui kImm_31 = 0x80000000;
+        static constexpr ui kImm_30_21 = 0x7FE00000;
+        static constexpr ui kImm_20 = 0x100000;
+        static constexpr ui kImm_19_12 = 0xFF000;
+        static constexpr ui kImm_31_25 = 0xFE000000;
+        static constexpr ui kImm_30_25 = 0x7E000000;
+        static constexpr ui kImm_11_7 = 0xF80;
+        static constexpr ui kImm_11_8 = 0xF00;
+        static constexpr ui kImm_7 = 0x80;
         ui pc_next;
-        ui ir_next;
-        bool ready_next;
+        CU2Decoder toDec_next;
+        ui ir;
 
     public:
         ControlUnit();

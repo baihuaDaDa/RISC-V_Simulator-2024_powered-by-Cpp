@@ -14,23 +14,26 @@ namespace riscv {
 
     struct RoBEntry {
         RoBType robType;
-        ui dest, value;
+        ui dest, value, instrAddr, jumpAddr;
         RoBState state;
 
-        RoBEntry() : robType(Rob_EXIT), dest(0), value(0), state(COMMIT) {}
+        RoBEntry() : robType(Rob_EXIT), dest(0), value(0), instrAddr(0), jumpAddr(0), state(COMMIT) {}
 
         RoBEntry(const Decoder2RoB &toRoB, RoBState state_) : robType(toRoB.robType), dest(toRoB.dest),
-                                                              value(toRoB.value), state(state_) {}
+                                                              value(toRoB.value), instrAddr(toRoB.instrAddr),
+                                                              jumpAddr(toRoB.jumpAddr), state(state_) {}
     };
 
     class ReorderBuffer {
+    private:
+        static constexpr ui kBufferSizeBin = 5;
     public:
-        LoopQueue<RoBEntry> buffer;
+        LoopQueue<RoBEntry, kBufferSizeBin> buffer;
         RoB2Reg toReg;
         RoB2RegStatus toRegSta;
         RoB2Mem toMem;
     private:
-        LoopQueue<RoBEntry> buffer_next;
+        LoopQueue<RoBEntry, kBufferSizeBin> buffer_next;
         RoB2Reg toReg_next;
         RoB2RegStatus toRegSta_next;
         RoB2Mem toMem_next;

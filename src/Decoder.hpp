@@ -17,32 +17,32 @@ namespace riscv {
         Decoder2LSB toLSB_next;
 
     private:
-        void func_lui(ui ir, ReorderBuffer &rob, RegisterFile &regFile);
+        void func_lui(ui pc, CU2Decoder &toDecoder, ReorderBuffer &rob, RegisterFile &regFile);
 
-        void func_auipc();
+        void func_auipc(ui pc, CU2Decoder &toDecoder, ReorderBuffer &rob, RegisterFile &regFile);
 
-        void func_jal();
+        void func_jal(ui pc, CU2Decoder &toDecoder, ReorderBuffer &rob, RegisterFile &regFile);
 
-        void func_jalr();
+        void func_jalr(ui pc, CU2Decoder &toDecoder, ReorderBuffer &rob, RegisterFile &regFile);
 
-        void func_branch();
+        void func_branch(ui pc, CU2Decoder &toDecoder, ReorderBuffer &rob, RegisterFile &regFile);
 
-        void func_load();
+        void func_load(ui pc, CU2Decoder &toDecoder, ReorderBuffer &rob, RegisterFile &regFile);
 
-        void func_store();
+        void func_store(ui pc, CU2Decoder &toDecoder, ReorderBuffer &rob, RegisterFile &regFile);
 
-        void func_calc();
+        void func_calc(ui pc, CU2Decoder &toDecoder, ReorderBuffer &rob, RegisterFile &regFile);
 
-        void func_calc_imm();
+        void func_calc_imm(ui pc, CU2Decoder &toDecoder, ReorderBuffer &rob, RegisterFile &regFile);
 
-        void func_exit();
+        void func_exit(ui pc, CU2Decoder &toDecoder, ReorderBuffer &rob, RegisterFile &regFile);
 
     public:
         Decoder();
 
         void flush();
 
-        void execute(ui ir, ReorderBuffer &rob, RegisterFile &regFile);
+        void execute(ui pc, CU2Decoder &toDecoder, ReorderBuffer &rob, RegisterFile &regFile);
 
     };
 
