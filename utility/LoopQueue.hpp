@@ -32,10 +32,16 @@ namespace riscv {
         void push_back(const T &t) {
             rear = (rear + 1) >> kMaxQueueBin;
             data[rear] = t;
+            ++size_;
         }
 
         void pop_front() {
             head = (head + 1) >> kMaxQueueBin;
+            --size_;
+        }
+
+        void clear() {
+            head = rear = size_ = 0;
         }
 
         T &front() {
@@ -71,6 +77,10 @@ namespace riscv {
         }
 
         T &at(ui id) {
+            return data[id];
+        }
+
+        const T &at(ui id) const {
             return data[id];
         }
 

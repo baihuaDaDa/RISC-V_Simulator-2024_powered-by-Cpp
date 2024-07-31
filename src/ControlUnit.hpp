@@ -30,9 +30,9 @@ namespace riscv {
     public:
         ControlUnit();
 
-        void flush();
+        void next();
 
-        void execute(Memory &mem);
+        void execute(Memory &mem, bool isFlush, RoB2CU &fromRoB, bool isJump);
     };
 
 } // riscv

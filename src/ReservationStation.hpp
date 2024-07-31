@@ -9,7 +9,8 @@ namespace riscv {
 
     struct RSEntry {
         CalcType calcType;
-        ui Qj, Qk, Vj, Vk;
+        int Qj, Qk;
+        ui Vj, Vk;
         ui robId;
         bool busy = false;
 
@@ -36,7 +37,9 @@ namespace riscv {
     public:
         ReservationStation();
 
-        void execute(Decoder2RS &fromDec, ALUResult &fromALU, MemResult &fromMem);
+        void execute(Decoder2RS &fromDec, ALUResult &fromALU, MemResult &fromMem, bool isFlush);
+
+        void next();
 
         void flush();
 

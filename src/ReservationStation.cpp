@@ -12,7 +12,7 @@ namespace riscv {
                 break;
             }
         }
-        if (tar == -1) throw "RS full.";
+        if (tar == -1) throw "RS lb_full.";
         station_next[tar] = RSEntry{toRS, true};
     }
 
@@ -31,7 +31,11 @@ namespace riscv {
         }
     }
 
-    void ReservationStation::execute(Decoder2RS &fromDec, ALUResult &fromALU, MemResult &fromMem) {
+    void ReservationStation::execute(Decoder2RS &fromDec, ALUResult &fromALU, MemResult &fromMem, bool isFlush) {
+        if (!isFlush) {
+            flush();
+            return;
+        }
         if (fromDec.ready) add(fromDec);
         if (fromMem.ready) update_dependency(fromMem.value, fromMem.robId);
         if (fromALU.ready) update_dependency(fromALU.value, fromALU.robId);
@@ -46,7 +50,7 @@ namespace riscv {
         }
     }
 
-    void ReservationStation::flush() {
+    void ReservationStation::next() {
         station = station_next;
         toALU = toALU_next;
         toALU_next.ready = false;
@@ -57,6 +61,11 @@ namespace riscv {
         for (int i = 0; i < kStationSize; i++)
             if (!station[i].busy) full = false;
         return full;
+    }
+
+    void ReservationStation::flush() {
+        for (int i = 0; i < kStationSize; ++i)
+            station_next[i].busy = false;
     }
 
 } // riscv

@@ -90,10 +90,11 @@ namespace riscv {
 
     enum RoBType {
         RoB_REG,
+        RoB_JALR,
         RoB_STORE_BYTE,
         RoB_STORE_HALF,
         RoB_STORE_WORD,
-        RoB_JUMP,
+        RoB_BRANCH,
         Rob_EXIT
     };
 
@@ -101,6 +102,7 @@ namespace riscv {
     struct CU2Decoder {
         Operation op;
         ui rs1, rs2, rd, imm, instrAddr;
+        bool isJump = false;
         bool ready = false;
     };
 
@@ -108,24 +110,31 @@ namespace riscv {
     struct Decoder2RoB {
         RoBType robType;
         ui dest, value, instrAddr, jumpAddr;
+        bool isJump = false;
         bool ready = false;
     };
 
     struct Decoder2RS {
         CalcType calcType;
-        ui Qj, Qk, Vj, Vk;
+        int Qj, Qk;
+        ui Vj, Vk;
         ui robId;
         bool ready = false;
     };
 
     struct Decoder2LSB {
         MemType memType;
-        ui Qj, Qk, Vj, Vk, dest;
+        int Qj, Qk;
+        ui Vj, Vk, imm, dest;
         ui robId, age;
         bool ready = false;
     };
 
     // RoB output
+    struct RoB2CU {
+        ui jumpAddr;
+    };
+
     struct RoB2Reg {
         ui rd, value, robId;
         bool ready = false;

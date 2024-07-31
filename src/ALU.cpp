@@ -27,7 +27,7 @@ namespace riscv {
         }
     }
 
-    void ALU::flush() {
+    void ALU::next() {
         result = result_next;
         result_next.ready = false;
     }

@@ -9,7 +9,7 @@ namespace riscv {
     }
 
     void ReorderBuffer::add(Decoder2RoB &toRoB) {
-        if (buffer.full()) throw "RoB full.";
+        if (buffer.full()) throw "RoB lb_full.";
         buffer_next.push_back(RoBEntry{toRoB, EXECUTE});
         if (toRoB.robType == RoB_REG) toRegSta_next = {toRoB.dest, buffer_next.back_identity(), true};
     }
@@ -20,6 +20,10 @@ namespace riscv {
     }
 
     void ReorderBuffer::execute(Decoder2RoB &toRoB, ALUResult &fromALU, MemResult &fromMem, SB2RoB &fromSB, bool memBusy) {
+        if (isFlush) {
+            flush();
+            return;
+        }
         if (toRoB.ready) add(toRoB);
         if (fromALU.ready) write_result(fromALU.value, fromALU.robId);
         if (fromMem.ready) write_result(fromMem.value, fromMem.robId);
@@ -29,6 +33,13 @@ namespace riscv {
             switch (top.robType) {
                 case RoB_REG:
                     toReg_next = {top.dest, top.value, buffer.front_identity(), true};
+                    break;
+                case RoB_JALR:
+                    toReg_next = {top.dest, top.value, buffer.front_identity(), true};
+                    if (top.jumpAddr != top.value) {
+                        isFlush_next = true;
+                        toCU_next.jumpAddr = top.value;
+                    }
                     break;
                 case RoB_STORE_BYTE:
                     if (!memBusy) {
@@ -48,7 +59,11 @@ namespace riscv {
                         toSB_next = {buffer.front_identity(), true};
                     }
                     break;
-                case RoB_JUMP:
+                case RoB_BRANCH:
+                    if (top.value != top.isJump) {
+                        isFlush_next = true;
+                        toCU_next.jumpAddr = top.value ? top.instrAddr + 4 : top.jumpAddr;
+                    }
                     break;
                 case Rob_EXIT:
                     break;
@@ -57,7 +72,7 @@ namespace riscv {
         }
     }
 
-    void ReorderBuffer::flush() {
+    void ReorderBuffer::next() {
         buffer = buffer_next;
         toReg = toReg_next;
         toReg_next.ready = false;
@@ -67,6 +82,24 @@ namespace riscv {
         toMem_next.ready = false;
         toSB = toSB_next;
         toSB_next.ready = false;
+        isFlush = isFlush_next;
+        isFlush_next = false;
+        toCU = toCU_next;
+    }
+
+    ui ReorderBuffer::next_rob_id() const {
+        return (buffer.back_identity() + 1) >> kBufferSizeBin;
+    }
+
+    FindResult ReorderBuffer::find_value(ui robId,ALUResult &fromALU, MemResult &fromMem, SB2RoB &fromSB) const {
+        if (fromALU.ready && fromALU.robId == robId) return {fromALU.value, true};
+        if (fromMem.ready && fromMem.robId == robId) return {fromMem.value, true};
+        if (fromSB.ready && fromSB.robId == robId) return {fromSB.value, true};
+        return {buffer.at(robId).value, buffer.at(robId).state == WRITE_RESULT};
+    }
+
+    void ReorderBuffer::flush() {
+        buffer_next.clear();
     }
 
 } // riscv

@@ -39,9 +39,11 @@ namespace riscv {
 
         void store_program(std::istream &is);
 
-        void load_instruction(ui pc);
+        ui load_instruction(ui pc);
 
-        void execute(RoB2Mem &fromRoB, LB2Mem &fromLSB);
+        void execute(RoB2Mem &fromRoB, LB2Mem &fromLSB, bool isFlush);
+
+        void next();
 
         void flush();
 

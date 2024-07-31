@@ -8,10 +8,10 @@ namespace riscv {
     class RegisterFile {
     private:
         ui regs_next[32]{};
-        ui regStatus_next[32]{};
+        int regStatus_next[32];
     public:
         ui regs[32]{};
-        ui regStatus[32]{};
+        int regStatus[32];
 
     private:
         void store_reg(ui rd, ui value, ui robId);
@@ -21,9 +21,13 @@ namespace riscv {
     public:
         RegisterFile();
 
+        ui load_reg(ui rs, RoB2Reg &toReg);
+
+        int get_dependency(ui rs, RoB2Reg &toReg, RoB2RegStatus &toRegSta);
+
         void execute(RoB2Reg &toReg, RoB2RegStatus &toRegSta);
 
-        void flush();
+        void next();
 
     };
 

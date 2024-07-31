@@ -9,7 +9,8 @@ namespace riscv {
 
     struct LBEntry {
         LoadType loadType;
-        ui Qj, Qk, Vj, Vk, dest, value;
+        int Qj, Qk;
+        ui Vj, Vk, dest, value;
         ui robId, age;
         bool busy = false;
 
@@ -30,13 +31,14 @@ namespace riscv {
 
     struct SBEntry {
         StoreType storeType;
-        ui Qj, Qk, Vj, Vk, dest;
+        int Qj, Qk;
+        ui Vj, Vk, imm, dest;
         ui robId, age;
 
         SBEntry() = default;
 
-        SBEntry(const Decoder2LSB &toLSB) : Qj(toLSB.Qj), Qk(toLSB.Qk), Vj(toLSB.Vj), Vk(toLSB.Vk), dest(toLSB.dest),
-                                            robId(toLSB.robId), age(toLSB.age) {
+        SBEntry(const Decoder2LSB &toLSB) : Qj(toLSB.Qj), Qk(toLSB.Qk), Vj(toLSB.Vj), Vk(toLSB.Vk), imm(toLSB.imm),
+                                            dest(toLSB.dest), robId(toLSB.robId), age(toLSB.age) {
             switch (toLSB.memType) {
                 case MEM_SB: storeType = STORE_BYTE; break;
                 case MEM_SH: storeType = STORE_HALF; break;
@@ -69,9 +71,15 @@ namespace riscv {
     public:
         LoadStoreBuffer();
 
-        void execute(Decoder2LSB &fromDec, ALUResult &fromALU, MemResult &fromMem, RoB2SB &fromRoB, bool memBusy);
+        void execute(Decoder2LSB &fromDec, ALUResult &fromALU, MemResult &fromMem, RoB2SB &fromRoB, bool memBusy, bool isFlush);
+
+        void next();
 
         void flush();
+
+        bool lb_full() const;
+
+        bool sb_full() const;
 
     };
 

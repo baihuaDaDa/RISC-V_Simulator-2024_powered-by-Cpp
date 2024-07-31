@@ -16,7 +16,7 @@ namespace riscv {
 
         void execute(RS2ALU &fromRS);
 
-        void flush();
+        void next();
 
     };
 

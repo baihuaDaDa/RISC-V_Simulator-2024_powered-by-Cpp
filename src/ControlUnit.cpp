@@ -1,12 +1,17 @@
 #include "ControlUnit.hpp"
 
 namespace riscv {
-    void ControlUnit::execute(Memory &mem) {
-        ir = mem.load_word(pc);
+    void ControlUnit::execute(Memory &mem, bool isFlush, RoB2CU &fromRoB, bool isJump) {
+        if (isFlush) {
+            pc = fromRoB.jumpAddr;
+            return;
+        }
+        ir = mem.load_instruction(pc);
         toDec_next.rd = (ir >> 7) & 0b11111;
         toDec_next.rs1 = (ir >> 15) & 0b11111;
         toDec_next.rs2 = (ir >> 20) & 0b11111;
-        toDec_next.ip = pc;
+        toDec_next.instrAddr = pc;
+        toDec_next.isJump = isJump;
         // decode: jumpAddr & sub-op
         switch (ir & 0b1111111) {
             case 0b0110111: // lui
@@ -100,9 +105,19 @@ namespace riscv {
         if (ir == 0x0ff00513) {
             toDec_next = {EXIT, 0, 0, 0, 0, true};
         }
+        if (toDec_next.op == JAL) {
+            pc_next = pc + toDec_next.imm;
+        } else if (toDec_next.op == JALR) {
+            pc_next = toDec_next.imm + mem.load_instruction(toDec_next.rs1);
+        } else if (toDec_next.op == BEQ || toDec_next.op == BNE || toDec_next.op == BLT || toDec_next.op == BGE
+                || toDec_next.op == BLTU || toDec_next.op == BGEU) {
+            if (isJump) pc_next = pc + toDec_next.imm;
+        } else {
+            pc_next = pc + 4;
+        }
     }
 
-    void ControlUnit::flush() {
+    void ControlUnit::next() {
         pc = pc_next;
         toDec = toDec_next;
     }

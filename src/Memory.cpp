@@ -21,7 +21,11 @@ namespace riscv {
         }
     }
 
-    void Memory::load_instruction(ui pc) {
+    ui Memory::load_instruction(ui pc) {
+        ui ret = 0;
+        for (int i = 3; i >=0; --i)
+            ret = (ret << 8) + memory[pc + i];
+        return ret;
     }
 
     void Memory::load_byte(LB2Mem &fromLSB) {
@@ -64,10 +68,13 @@ namespace riscv {
         memory[fromRoB.addr + 3] = fromRoB.value & 0xff000000;
     }
 
-    void Memory::execute(RoB2Mem &fromRoB, LB2Mem &fromLSB) {
-        ++clock;
+    void Memory::execute(RoB2Mem &fromRoB, LB2Mem &fromLSB, bool isFlush) {
+        if (isFlush) {
+            flush();
+            return;
+        }
         if (busy) return;
-        busy = true;
+        if (fromLSB.ready || fromRoB.ready) busy = true;
         if (fromLSB.ready) {
             switch (fromLSB.loadType) {
                 case LOAD_BYTE: load_byte(fromLSB); break;
@@ -84,15 +91,21 @@ namespace riscv {
                 case STORE_WORD: store_word(fromRoB); break;
             }
         }
+        if (busy) ++clock;
     }
 
-    void Memory::flush() {
-        result = result_next;
-        result_next.ready = false;
+    void Memory::next() {
+        result.ready = false;
         if (clock == 3) {
             clock = 0;
             busy = false;
+            result = result_next;
         }
+    }
+
+    void Memory::flush() {
+        clock = 0;
+        busy = false;
     }
 
 }
