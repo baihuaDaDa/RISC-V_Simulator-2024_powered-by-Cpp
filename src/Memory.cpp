@@ -24,27 +24,27 @@ namespace riscv {
     void Memory::load_instruction(ui pc) {
     }
 
-    void Memory::load_byte(LSB2Mem &fromLSB) {
+    void Memory::load_byte(LB2Mem &fromLSB) {
         result_next = {fromLSB.robId, sext(memory[fromLSB.addr], 7), true};
     }
 
-    void Memory::load_half(LSB2Mem &fromLSB) {
+    void Memory::load_half(LB2Mem &fromLSB) {
         ui ret = memory[fromLSB.addr] + (memory[fromLSB.addr + 1] << 8);
         result_next = {fromLSB.robId, sext(ret, 15), true};
     }
 
-    void Memory::load_word(LSB2Mem &fromLSB) {
+    void Memory::load_word(LB2Mem &fromLSB) {
         ui ret = 0;
         for (int i = 3; i >=0; --i)
             ret = (ret << 8) + memory[fromLSB.addr + i];
         result_next = {fromLSB.robId, ret, true};
     }
 
-    void Memory::load_byte_unsigned(LSB2Mem &fromLSB) {
+    void Memory::load_byte_unsigned(LB2Mem &fromLSB) {
         result_next = {fromLSB.robId, ui(memory[fromLSB.addr]), true};
     }
 
-    void Memory::load_half_unsigned(LSB2Mem &fromLSB) {
+    void Memory::load_half_unsigned(LB2Mem &fromLSB) {
         result_next = {fromLSB.robId, ui(memory[fromLSB.addr] + (memory[fromLSB.addr + 1] << 8)), true};
     }
 
@@ -64,7 +64,7 @@ namespace riscv {
         memory[fromRoB.addr + 3] = fromRoB.value & 0xff000000;
     }
 
-    void Memory::execute(RoB2Mem &fromRoB, LSB2Mem &fromLSB) {
+    void Memory::execute(RoB2Mem &fromRoB, LB2Mem &fromLSB) {
         ++clock;
         if (busy) return;
         busy = true;

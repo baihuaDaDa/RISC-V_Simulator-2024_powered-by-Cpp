@@ -31,9 +31,8 @@ namespace riscv {
         }
     }
 
-    void ReservationStation::execute(Decoder2RS &fromDec, LSB2RS &fromLSB, ALUResult &fromALU, MemResult &fromMem) {
+    void ReservationStation::execute(Decoder2RS &fromDec, ALUResult &fromALU, MemResult &fromMem) {
         if (fromDec.ready) add(fromDec);
-        if (fromLSB.ready) update_dependency(fromLSB.value, fromLSB.robId);
         if (fromMem.ready) update_dependency(fromMem.value, fromMem.robId);
         if (fromALU.ready) update_dependency(fromALU.value, fromALU.robId);
         for (int i = 0; i < kStationSize; i++) {

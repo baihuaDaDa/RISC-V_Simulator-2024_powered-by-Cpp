@@ -32,21 +32,25 @@ namespace riscv {
         RoB2Reg toReg;
         RoB2RegStatus toRegSta;
         RoB2Mem toMem;
+        RoB2SB toSB;
     private:
         LoopQueue<RoBEntry, kBufferSizeBin> buffer_next;
         RoB2Reg toReg_next;
         RoB2RegStatus toRegSta_next;
         RoB2Mem toMem_next;
+        RoB2SB toSB_next;
 
     private:
         void add(Decoder2RoB &toRoB);
+
+        void write_result(ui value, ui robId);
 
     public:
         ReorderBuffer();
 
         bool full() const;
 
-        void execute(Decoder2RoB &toRoB);
+        void execute(Decoder2RoB &toRoB, ALUResult &fromALU, MemResult &fromMem, SB2RoB &fromSB, bool memBusy);
 
         void flush();
 

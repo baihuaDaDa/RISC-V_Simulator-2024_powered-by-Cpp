@@ -142,6 +142,11 @@ namespace riscv {
         bool ready = false;
     };
 
+    struct RoB2SB {
+        ui robId;
+        bool ready = false;
+    };
+
     // RS output
     struct RS2ALU {
         CalcType calcType;
@@ -150,22 +155,12 @@ namespace riscv {
     };
 
     // LSB output
-    struct LB2RoB {
-        ui robId, value;
-        bool ready = false;
-    };
-
     struct SB2RoB {
         ui robId, value;
         bool ready = false;
     };
 
-    struct LSB2RS {
-        ui robId, value;
-        bool ready = false;
-    };
-
-    struct LSB2Mem {
+    struct LB2Mem {
         LoadType loadType;
         ui addr, robId;
         bool ready = false;

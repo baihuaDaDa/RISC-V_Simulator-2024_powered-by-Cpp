@@ -18,15 +18,15 @@ namespace riscv {
         MemResult result_next;
 
     private:
-        void load_byte(LSB2Mem &fromLSB);
+        void load_byte(LB2Mem &fromLSB);
 
-        void load_half(LSB2Mem &fromLSB);
+        void load_half(LB2Mem &fromLSB);
 
-        void load_word(LSB2Mem &fromLSB);
+        void load_word(LB2Mem &fromLSB);
 
-        void load_byte_unsigned(LSB2Mem &fromLSB);
+        void load_byte_unsigned(LB2Mem &fromLSB);
 
-        void load_half_unsigned(LSB2Mem &fromLSB);
+        void load_half_unsigned(LB2Mem &fromLSB);
 
         void store_byte(RoB2Mem &fromRoB);
 
@@ -41,7 +41,7 @@ namespace riscv {
 
         void load_instruction(ui pc);
 
-        void execute(RoB2Mem &fromRoB, LSB2Mem &fromLSB);
+        void execute(RoB2Mem &fromRoB, LB2Mem &fromLSB);
 
         void flush();
 

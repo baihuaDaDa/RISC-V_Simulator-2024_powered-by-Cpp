@@ -36,7 +36,7 @@ namespace riscv {
     public:
         ReservationStation();
 
-        void execute(Decoder2RS &fromDec, LSB2RS &fromLSB, ALUResult &fromALU, MemResult &fromMem);
+        void execute(Decoder2RS &fromDec, ALUResult &fromALU, MemResult &fromMem);
 
         void flush();
 

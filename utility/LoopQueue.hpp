@@ -70,7 +70,7 @@ namespace riscv {
             return data[(ind + head + 1) >> kMaxQueueBin];
         }
 
-        T &at(ui id) const {
+        T &at(ui id) {
             return data[id];
         }
 

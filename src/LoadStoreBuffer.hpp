@@ -52,18 +52,14 @@ namespace riscv {
         static constexpr ui kBufferSize = 1 << kBufferSizeBin;
         LoopQueue<SBEntry, kBufferSizeBin> storeBuffer_next;
         std::array<LBEntry, kBufferSize> loadBuffer_next;
-        LB2RoB lb2RoB_next;
-        SB2RoB sb2RoB_next;
-        LSB2RS toRS_next;
-        LSB2Mem toMem_next;
+        LB2Mem toMem_next;
+        SB2RoB toRoB_next;
 
     public:
         LoopQueue<SBEntry, kBufferSizeBin> storeBuffer;
         std::array<LBEntry, kBufferSize> loadBuffer;
-        LB2RoB lb2RoB;
-        SB2RoB sb2RoB;
-        LSB2RS toRS;
-        LSB2Mem toMem;
+        LB2Mem toMem;
+        SB2RoB toRoB;
 
     private:
         void update_dependency(ui value, ui robId);
@@ -73,7 +69,7 @@ namespace riscv {
     public:
         LoadStoreBuffer();
 
-        void execute(Decoder2LSB &fromDec, ALUResult &fromALU, MemResult &fromMem);
+        void execute(Decoder2LSB &fromDec, ALUResult &fromALU, MemResult &fromMem, RoB2SB &fromRoB, bool memBusy);
 
         void flush();
 
