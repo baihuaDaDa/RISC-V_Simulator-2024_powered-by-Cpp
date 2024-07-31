@@ -66,6 +66,7 @@ namespace riscv {
                     }
                     break;
                 case Rob_EXIT:
+                    exit = true;
                     break;
             }
             if (!memBusy) buffer_next.pop_front();

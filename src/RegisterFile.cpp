@@ -8,12 +8,13 @@ namespace riscv {
     }
 
     void RegisterFile::store_reg(ui rd, ui value, ui robId) {
+        if (rd == 0) return;
         regs_next[rd] = value;
         if (regStatus[rd] == robId) regStatus_next[rd] = -1;
     }
 
     void RegisterFile::set_dependency(ui rd, ui robId) {
-        regStatus_next[rd] = robId;
+        if (rd != 0) regStatus_next[rd] = robId;
     }
 
     ui RegisterFile::load_reg(ui rs, RoB2Reg &toReg) {

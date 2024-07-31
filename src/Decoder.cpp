@@ -15,6 +15,7 @@ namespace riscv {
 
     void Decoder::execute(CU2Decoder &toDecoder, ReorderBuffer &rob, RegisterFile &regFile, ReservationStation &rs, LoadStoreBuffer &lsb, ALUResult &fromALU, MemResult &fromMem, SB2RoB &fromSB, bool isFlush) {
         if (isFlush) return;
+        if (!toDecoder.ready) return;
         switch (toDecoder.op) {
             case LUI: func_lui(toDecoder, rob, regFile, rs, lsb, fromALU, fromMem, fromSB); break;
             case AUIPC: func_auipc(toDecoder, rob, regFile, rs, lsb, fromALU, fromMem, fromSB); break;
@@ -103,7 +104,7 @@ namespace riscv {
         if (rob.full() || lsb.lb_full()) return;
         int regStatus = regFile.get_dependency(toDecoder.rs1, rob.toReg, rob.toRegSta);
         toRoB_next = {RoB_REG, toDecoder.rd, 0, toDecoder.instrAddr, 0, false, true};
-        toLSB_next = {MemType(toDecoder.op - LB + MEM_LB), regStatus, -1, 0, toDecoder.imm, 0, 0, rob.next_rob_id(), , true};
+        toLSB_next = {MemType(toDecoder.op - LB + MEM_LB), regStatus, -1, 0, toDecoder.imm, 0, 0, rob.next_rob_id(), toDecoder.age, true};
         if (regStatus == -1) toLSB_next.Vj = regFile.load_reg(toDecoder.rs1, rob.toReg);
         else {
             auto result = rob.find_value(regStatus, fromALU, fromMem, fromSB);
@@ -116,7 +117,7 @@ namespace riscv {
         int rs1Status = regFile.get_dependency(toDecoder.rs1, rob.toReg, rob.toRegSta);
         int rs2Status = regFile.get_dependency(toDecoder.rs2, rob.toReg, rob.toRegSta);
         toRoB_next = {RoBType(toDecoder.op - SB + RoB_STORE_BYTE), toDecoder.rd, 0, toDecoder.instrAddr, 0, false, true};
-        toLSB_next = {MemType(toDecoder.op - SB + MEM_SB), rs1Status, rs2Status, 0, 0, toDecoder.imm, 0, rob.next_rob_id(), , true};
+        toLSB_next = {MemType(toDecoder.op - SB + MEM_SB), rs1Status, rs2Status, 0, 0, toDecoder.imm, 0, rob.next_rob_id(), toDecoder.age, true};
         if (rs1Status == -1) toLSB_next.Vj = regFile.load_reg(toDecoder.rs1, rob.toReg);
         else {
             auto result = rob.find_value(rs1Status, fromALU, fromMem, fromSB);

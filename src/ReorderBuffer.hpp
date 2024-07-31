@@ -42,6 +42,7 @@ namespace riscv {
         RoB2SB toSB;
         RoB2CU toCU;
         bool isFlush = false;
+        bool exit = false;
     private:
         LoopQueue<RoBEntry, kBufferSizeBin> buffer_next;
         RoB2Reg toReg_next;

@@ -24,11 +24,9 @@ namespace riscv {
         void next();
 
     public:
-        CPU();
+        CPU(Memory *mem_);
 
-        ~CPU();
-
-        void run();
+        ui run();
 
     };
 

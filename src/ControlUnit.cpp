@@ -4,8 +4,10 @@ namespace riscv {
     void ControlUnit::execute(Memory &mem, bool isFlush, RoB2CU &fromRoB, bool isJump) {
         if (isFlush) {
             pc = fromRoB.jumpAddr;
+            exit = false;
             return;
         }
+        if (exit) return;
         ir = mem.load_instruction(pc);
         toDec_next.rd = (ir >> 7) & 0b11111;
         toDec_next.rs1 = (ir >> 15) & 0b11111;
@@ -43,6 +45,7 @@ namespace riscv {
                 break;
             case 0b0000011: // load
                 toDec_next.imm = sext((ir & kImm_31_20) >> 20, 11);
+                toDec_next.age = memInstrCnt++;
                 switch ((ir & kSubOpcode) >> 12) {
                     case 0b000: toDec_next.op = LB; break;
                     case 0b001: toDec_next.op = LH; break;
@@ -53,6 +56,7 @@ namespace riscv {
                 break;
             case 0b0100011: // store
                 toDec_next.imm = sext(((ir & kImm_31_25) >> 20) + ((ir & kImm_11_7) >> 7), 11);
+                toDec_next.age = memInstrCnt++;
                 switch ((ir & kSubOpcode) >> 12) {
                     case 0b000: toDec_next.op = SB; break;
                     case 0b001: toDec_next.op = SH; break;
@@ -104,6 +108,7 @@ namespace riscv {
         toDec_next.ready = true;
         if (ir == 0x0ff00513) {
             toDec_next = {EXIT, 0, 0, 0, 0, true};
+            exit = true;
         }
         if (toDec_next.op == JAL) {
             pc_next = pc + toDec_next.imm;
@@ -120,10 +125,8 @@ namespace riscv {
     void ControlUnit::next() {
         pc = pc_next;
         toDec = toDec_next;
+        toDec_next.ready = false;
     }
 
-    ControlUnit::ControlUnit() {
-        pc_next = 0x00000000;
-        ir = 0;
-    }
+    ControlUnit::ControlUnit() = default;
 } // riscv

@@ -101,7 +101,7 @@ namespace riscv {
     // CU output
     struct CU2Decoder {
         Operation op;
-        ui rs1, rs2, rd, imm, instrAddr;
+        ui rs1, rs2, rd, imm, instrAddr, age;
         bool isJump = false;
         bool ready = false;
     };

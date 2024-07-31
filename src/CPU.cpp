@@ -2,16 +2,15 @@
 
 namespace riscv {
 
-    CPU::CPU() = default;
+    CPU::CPU(Memory *mem_) : mem(mem_) {}
 
-    CPU::~CPU() {
-        delete mem;
-    }
-
-    void CPU::run() {
-        ++clock;
-        execute();
-        next();
+    ui CPU::run() {
+        while (true) {
+            if (rob.exit) return regFile.load_reg(10, rob.toReg);
+            ++clock;
+            execute();
+            next();
+        }
     }
 
     void CPU::execute() {
