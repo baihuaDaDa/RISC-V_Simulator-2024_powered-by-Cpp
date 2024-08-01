@@ -14,7 +14,7 @@ namespace riscv {
     public:
         ALU();
 
-        void execute(RS2ALU &fromRS);
+        void execute(RS2ALU &fromRS, bool isFlush);
 
         void next();
 

@@ -4,12 +4,17 @@ namespace riscv {
 
     LoadStoreBuffer::LoadStoreBuffer() = default;
 
-    void LoadStoreBuffer::add(riscv::Decoder2LSB &fromDec) {
-        for (int i = 0; i < kBufferSize; ++i) {
-            if (!loadBuffer[i].busy) {
-                loadBuffer_next[i] = LBEntry(fromDec, true);
-                break;
+    void LoadStoreBuffer::add(Decoder2LSB &fromDec) {
+        if (fromDec.memType <= 4) {
+            for (int i = 0; i < kBufferSize; ++i) {
+                if (!loadBuffer[i].busy) {
+                    loadBuffer_next[i] = LBEntry(fromDec, true);
+                    break;
+                }
             }
+        } else {
+            if (storeBuffer.full()) throw "store buffer full.";
+            storeBuffer_next.push_back(SBEntry(fromDec));
         }
     }
 
@@ -19,7 +24,6 @@ namespace riscv {
                 if (loadBuffer[i].Qj == robId) {
                     loadBuffer_next[i].Vj = value;
                     loadBuffer_next[i].Qj = -1;
-                    loadBuffer_next[i].dest = loadBuffer_next[i].Vj + loadBuffer_next[i].Vk;
                 }
             }
         }
@@ -27,7 +31,6 @@ namespace riscv {
             if (storeBuffer[i].Qj == robId) {
                 storeBuffer_next[i].Vj = value;
                 storeBuffer_next[i].Qj = -1;
-                storeBuffer_next[i].dest = storeBuffer_next[i].Vj + storeBuffer_next[i].imm;
             }
             if (storeBuffer[i].Qk == robId) {
                 storeBuffer_next[i].Vk = value;
@@ -53,14 +56,15 @@ namespace riscv {
         if (!storeBuffer.empty()) {
             auto &storeEntry = storeBuffer.front();
             if (storeEntry.Qj == -1 && storeEntry.Qk == -1) {
-                toRoB_next = {storeEntry.robId, storeEntry.Vk, true};
+                toRoB_next = {storeEntry.robId, storeEntry.Vj + storeEntry.imm, storeEntry.Vk, true};
             }
         }
         if (!memBusy) {
             for (int i = 0; i < kBufferSize; ++i) {
                 auto &loadEntry = loadBuffer[i];
-                if (loadEntry.busy && loadEntry.Qj == -1 && loadEntry.age < storeBuffer.front().age) {
-                    toMem_next = {loadEntry.loadType, loadEntry.dest, loadEntry.robId, true};
+//                std::cerr << loadEntry.busy << " " << loadEntry.Qj << " " << storeBuffer.empty() << std::endl;
+                if (loadEntry.busy && loadEntry.Qj == -1 && (storeBuffer.empty() || (!storeBuffer.empty() && loadEntry.age < storeBuffer.front().age))) {
+                    toMem_next = {loadEntry.loadType, loadEntry.Vj + loadEntry.Vk, loadEntry.robId, true};
                     loadBuffer_next[i].busy = false;
                 }
             }
@@ -83,19 +87,16 @@ namespace riscv {
         storeBuffer_next.clear();
     }
 
-    bool LoadStoreBuffer::lb_full() const {
-        bool full = true;
+    bool LoadStoreBuffer::lb_full(Decoder2LSB &fromDec) const {
+        int cnt = 0;
         for (int i = 0; i < kBufferSize; ++i) {
-            if (!loadBuffer[i].busy) {
-                full = false;
-                break;
-            }
+            if (!loadBuffer[i].busy) ++cnt;
         }
-        return full;
+        return cnt <= (fromDec.ready && fromDec.memType <= 4);
     }
 
-    bool LoadStoreBuffer::sb_full() const {
-        return storeBuffer.full();
+    bool LoadStoreBuffer::sb_full(Decoder2LSB &fromDec, RoB2SB &fromRoB) const {
+        return storeBuffer.size() + (fromDec.ready && fromDec.memType > 4) - fromRoB.ready >= kBufferSize;
     }
 
 } // riscv

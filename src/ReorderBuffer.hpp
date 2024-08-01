@@ -6,12 +6,6 @@
 
 namespace riscv {
 
-    enum RoBState {
-        EXECUTE,
-        WRITE_RESULT,
-        COMMIT
-    };
-
     struct RoBEntry {
         RoBType robType;
         ui dest, value, instrAddr, jumpAddr;
@@ -20,9 +14,9 @@ namespace riscv {
 
         RoBEntry() : robType(Rob_EXIT), dest(0), value(0), instrAddr(0), jumpAddr(0), state(COMMIT) {}
 
-        RoBEntry(const Decoder2RoB &toRoB, RoBState state_) : robType(toRoB.robType), dest(toRoB.dest),
+        RoBEntry(const Decoder2RoB &toRoB) : robType(toRoB.robType), dest(toRoB.dest),
                                                               value(toRoB.value), instrAddr(toRoB.instrAddr),
-                                                              jumpAddr(toRoB.jumpAddr), state(state_),
+                                                              jumpAddr(toRoB.jumpAddr), state(toRoB.state),
                                                               isJump(toRoB.isJump) {}
     };
 
@@ -33,20 +27,20 @@ namespace riscv {
 
     class ReorderBuffer {
     private:
-        static constexpr ui kBufferSizeBin = 5;
+        static constexpr ui kBufferCapBin = 5;
+        static constexpr ui kBufferSize = (1 << kBufferCapBin) - 1; // 循环队列capacity比实际空间少1
     public:
-        LoopQueue<RoBEntry, kBufferSizeBin> buffer;
+        LoopQueue<RoBEntry, kBufferCapBin> buffer;
         RoB2Reg toReg;
-        RoB2RegStatus toRegSta;
         RoB2Mem toMem;
         RoB2SB toSB;
         RoB2CU toCU;
         bool isFlush = false;
         bool exit = false;
+        ui commitCnt = 0;
     private:
-        LoopQueue<RoBEntry, kBufferSizeBin> buffer_next;
+        LoopQueue<RoBEntry, kBufferCapBin> buffer_next;
         RoB2Reg toReg_next;
-        RoB2RegStatus toRegSta_next;
         RoB2Mem toMem_next;
         RoB2SB toSB_next;
         RoB2CU toCU_next;
@@ -55,16 +49,18 @@ namespace riscv {
     private:
         void add(Decoder2RoB &toRoB);
 
-        void write_result(ui value, ui robId);
+        void write_result_reg(ui value, ui robId);
+
+        void write_result_mem(ui dest, ui value, ui robId);
 
     public:
         ReorderBuffer();
 
-        bool full() const;
+        bool full(Decoder2RoB &toRoB) const;
 
-        ui next_rob_id() const;
+        ui next_rob_id(Decoder2RoB &toRoB) const;
 
-        FindResult find_value(ui robId, ALUResult &fromALU, MemResult &fromMem, SB2RoB &fromSB) const;
+        FindResult find_value(ui robId, Decoder2RoB &fromDec, ALUResult &fromALU, MemResult &fromMem, SB2RoB &fromSB) const;
 
         void execute(Decoder2RoB &toRoB, ALUResult &fromALU, MemResult &fromMem, SB2RoB &fromSB, bool memBusy);
 

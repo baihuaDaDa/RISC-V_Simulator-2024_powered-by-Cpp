@@ -4,7 +4,8 @@ namespace riscv {
 
     ALU::ALU() = default;
 
-    void ALU::execute(RS2ALU &fromRS) {
+    void ALU::execute(RS2ALU &fromRS, bool isFlush) {
+        if (isFlush) return;
         if (fromRS.ready) {
             switch (fromRS.calcType) {
                 case CALC_ADD: result_next.value = fromRS.opr1 + fromRS.opr2; break;

@@ -13,10 +13,14 @@ namespace riscv {
         Decoder2RoB toRoB;
         Decoder2RS toRS;
         Decoder2LSB toLSB;
+        Decoder2RegStatus toRegSta;
+        bool isFull = false;
     private:
         Decoder2RoB toRoB_next;
         Decoder2RS toRS_next;
         Decoder2LSB toLSB_next;
+        Decoder2RegStatus toRegSta_next;
+        bool isFull_next = false;
 
     private:
         void func_lui(CU2Decoder &toDecoder, ReorderBuffer &rob, RegisterFile &regFile, ReservationStation &rs, LoadStoreBuffer &lsb, ALUResult &fromALU, MemResult &fromMem, SB2RoB &fromSB);

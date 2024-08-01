@@ -24,7 +24,6 @@ namespace riscv {
         static constexpr ui kImm_11_8 = 0xF00;
         static constexpr ui kImm_7 = 0x80;
         ui pc_next = 0x00000000;
-        CU2Decoder toDec_next;
         ui ir = 0;
         ui memInstrCnt = 0;
         bool exit = false;
@@ -34,7 +33,7 @@ namespace riscv {
 
         void next();
 
-        void execute(Memory &mem, bool isFlush, RoB2CU &fromRoB, bool isJump);
+        void execute(Memory &mem, bool isFlush, RoB2CU &fromRoB, bool isJump, bool isFull);
 
     };
 

@@ -6,22 +6,29 @@ namespace riscv {
 
     ui CPU::run() {
         while (true) {
-            if (rob.exit) return regFile.load_reg(10, rob.toReg);
+            if (rob.exit) return (std::uint8_t)(regFile.load_reg(10, rob.toReg));
             ++clock;
+            std::cerr << "Clock: " << clock << std::endl;
             execute();
             next();
+            std::cerr << "Commit cnt: " << rob.commitCnt << std::endl << std::endl;
         }
     }
 
     void CPU::execute() {
-        cu.execute(*mem, rob.isFlush, rob.toCU, true);
+        /* one single module */
+        std::cerr << "isFull: " << dec.isFull << std::endl;
+        cu.execute(*mem, rob.isFlush, rob.toCU, true, dec.isFull);
+        std::cerr << "CU: " << cu.pc << " " << cu.toDec.op << std::endl;
         dec.execute(cu.toDec, rob, regFile, rs, lsb, alu.result, mem->result, lsb.toRoB, rob.isFlush);
-        rob.execute(dec.toRoB, alu.result, mem->result, lsb.toRoB, rob.isFlush);
+        /* one single module */
+        std::cerr << "toRoB: " << dec.toRoB.robType << " " << dec.toRoB.instrAddr << " " << dec.toRoB.ready << std::endl;
+        rob.execute(dec.toRoB, alu.result, mem->result, lsb.toRoB, mem->is_busy(rob.toMem, lsb.toMem));
         rs.execute(dec.toRS, alu.result, mem->result, rob.isFlush);
-        alu.execute(rs.toALU);
-        lsb.execute(dec.toLSB, alu.result, mem->result, rob.toSB, mem->busy, rob.isFlush);
+        alu.execute(rs.toALU, rob.isFlush);
+        lsb.execute(dec.toLSB, alu.result, mem->result, rob.toSB, mem->is_busy(rob.toMem, lsb.toMem), rob.isFlush);
         mem->execute(rob.toMem, lsb.toMem, rob.isFlush);
-        regFile.execute(rob.toReg, rob.toRegSta);
+        regFile.execute(rob.toReg, dec.toRegSta, rob.isFlush);
     }
 
     void CPU::next() {

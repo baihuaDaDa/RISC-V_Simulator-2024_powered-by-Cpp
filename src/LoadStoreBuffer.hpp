@@ -10,13 +10,13 @@ namespace riscv {
     struct LBEntry {
         LoadType loadType;
         int Qj, Qk;
-        ui Vj, Vk, dest, value;
+        ui Vj, Vk, value;
         ui robId, age;
         bool busy = false;
 
         LBEntry() = default;
 
-        LBEntry(const Decoder2LSB &toLSB, bool busy_) : Qj(toLSB.Qj), Qk(toLSB.Qk), Vj(toLSB.Vj), Vk(toLSB.Vk), dest(toLSB.dest),
+        LBEntry(const Decoder2LSB &toLSB, bool busy_) : Qj(toLSB.Qj), Qk(toLSB.Qk), Vj(toLSB.Vj), Vk(toLSB.Vk),
                                             robId(toLSB.robId), age(toLSB.age), value(0), busy(busy_) {
             switch (toLSB.memType) {
                 case MEM_LB: loadType = LOAD_BYTE; break;
@@ -32,13 +32,13 @@ namespace riscv {
     struct SBEntry {
         StoreType storeType;
         int Qj, Qk;
-        ui Vj, Vk, imm, dest;
+        ui Vj, Vk, imm;
         ui robId, age;
 
         SBEntry() = default;
 
         SBEntry(const Decoder2LSB &toLSB) : Qj(toLSB.Qj), Qk(toLSB.Qk), Vj(toLSB.Vj), Vk(toLSB.Vk), imm(toLSB.imm),
-                                            dest(toLSB.dest), robId(toLSB.robId), age(toLSB.age) {
+                                            robId(toLSB.robId), age(toLSB.age) {
             switch (toLSB.memType) {
                 case MEM_SB: storeType = STORE_BYTE; break;
                 case MEM_SH: storeType = STORE_HALF; break;
@@ -50,15 +50,15 @@ namespace riscv {
 
     class LoadStoreBuffer {
     private:
-        static constexpr ui kBufferSizeBin = 4;
-        static constexpr ui kBufferSize = 1 << kBufferSizeBin;
-        LoopQueue<SBEntry, kBufferSizeBin> storeBuffer_next;
+        static constexpr ui kBufferCapBin = 4;
+        static constexpr ui kBufferSize = (1 << kBufferCapBin) - 1;
+        LoopQueue<SBEntry, kBufferCapBin> storeBuffer_next;
         std::array<LBEntry, kBufferSize> loadBuffer_next;
         LB2Mem toMem_next;
         SB2RoB toRoB_next;
 
     public:
-        LoopQueue<SBEntry, kBufferSizeBin> storeBuffer;
+        LoopQueue<SBEntry, kBufferCapBin> storeBuffer;
         std::array<LBEntry, kBufferSize> loadBuffer;
         LB2Mem toMem;
         SB2RoB toRoB;
@@ -77,9 +77,9 @@ namespace riscv {
 
         void flush();
 
-        bool lb_full() const;
+        bool lb_full(Decoder2LSB &toLSB) const;
 
-        bool sb_full() const;
+        bool sb_full(Decoder2LSB &fromDec, RoB2SB &fromRoB) const;
 
     };
 

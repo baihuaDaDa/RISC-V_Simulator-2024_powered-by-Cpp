@@ -10,6 +10,7 @@ namespace riscv {
     class LoopQueue {
     public:
         static constexpr ui kMaxQueue = 1 << kMaxQueueBin;
+        static constexpr ui kMaxQueueBin_mod = (1 << kMaxQueueBin) - 1;
     private:
         T data[kMaxQueue]{};
         ui head = 0, rear = 0, size_ = 0;
@@ -17,9 +18,9 @@ namespace riscv {
     public:
         LoopQueue() = default;
 
-        LoopQueue &operator=(LoopQueue &rhs) {
+        LoopQueue &operator=(const LoopQueue &rhs) {
             if (this == &rhs) return *this;
-            for (ui i = (rhs.head + 1) >> kMaxQueueBin; rhs.head != rhs.rear; i = (i + 1) >> kMaxQueueBin) {
+            for (ui i = (rhs.head + 1) & kMaxQueueBin_mod; rhs.head != rhs.rear; i = (i + 1) & kMaxQueueBin_mod) {
                 data[i] = rhs.data[i];
                 if (i == rhs.rear) break;
             }
@@ -30,13 +31,13 @@ namespace riscv {
         }
 
         void push_back(const T &t) {
-            rear = (rear + 1) >> kMaxQueueBin;
+            rear = (rear + 1) & kMaxQueueBin_mod;
             data[rear] = t;
             ++size_;
         }
 
         void pop_front() {
-            head = (head + 1) >> kMaxQueueBin;
+            head = (head + 1) & kMaxQueueBin_mod;
             --size_;
         }
 
@@ -45,11 +46,11 @@ namespace riscv {
         }
 
         T &front() {
-            return data[(head + 1) >> kMaxQueueBin];
+            return data[(head + 1) & kMaxQueueBin_mod];
         }
 
         const T &front() const {
-            return data[(head + 1) >> kMaxQueueBin];
+            return data[(head + 1) & kMaxQueueBin_mod];
         }
 
         T &back() {
@@ -73,7 +74,7 @@ namespace riscv {
         }
 
         T &operator[](ui ind) {
-            return data[(ind + head + 1) >> kMaxQueueBin];
+            return data[(ind + head + 1) & kMaxQueueBin_mod];
         }
 
         T &at(ui id) {
@@ -85,7 +86,7 @@ namespace riscv {
         }
 
         ui front_identity() const {
-            return (head + 1) >> kMaxQueueBin;
+            return (head + 1) & kMaxQueueBin_mod;
         }
 
         ui back_identity() const {

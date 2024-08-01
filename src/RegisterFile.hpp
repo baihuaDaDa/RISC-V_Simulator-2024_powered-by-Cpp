@@ -23,11 +23,13 @@ namespace riscv {
 
         ui load_reg(ui rs, RoB2Reg &toReg);
 
-        int get_dependency(ui rs, RoB2Reg &toReg, RoB2RegStatus &toRegSta);
+        int get_dependency(ui rs, RoB2Reg &toReg, Decoder2RegStatus &toRegSta);
 
-        void execute(RoB2Reg &toReg, RoB2RegStatus &toRegSta);
+        void execute(RoB2Reg &toReg, Decoder2RegStatus &toRegSta, bool isFlush);
 
         void next();
+
+        void flush();
 
     };
 

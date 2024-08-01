@@ -32,7 +32,7 @@ namespace riscv {
     }
 
     void ReservationStation::execute(Decoder2RS &fromDec, ALUResult &fromALU, MemResult &fromMem, bool isFlush) {
-        if (!isFlush) {
+        if (isFlush) {
             flush();
             return;
         }
@@ -56,11 +56,11 @@ namespace riscv {
         toALU_next.ready = false;
     }
 
-    bool ReservationStation::full() const {
-        bool full = true;
+    bool ReservationStation::full(Decoder2RS &toRS) const {
+        ui cnt = 0;
         for (int i = 0; i < kStationSize; i++)
-            if (!station[i].busy) full = false;
-        return full;
+            if (!station[i].busy) ++cnt;
+        return cnt <= toRS.ready;
     }
 
     void ReservationStation::flush() {

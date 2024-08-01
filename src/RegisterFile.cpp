@@ -22,13 +22,26 @@ namespace riscv {
         return regs[rs];
     }
 
-    int RegisterFile::get_dependency(ui rs, RoB2Reg &toReg, RoB2RegStatus &toRegSta) {
-        if (toReg.ready && toReg.rd == rs && regStatus[toReg.rd] == toReg.robId) return -1;
-        if (toRegSta.ready && toRegSta.rd == rs) return toRegSta.robId;
+    int RegisterFile::get_dependency(ui rs, RoB2Reg &toReg, Decoder2RegStatus &toRegSta) {
+        bool revised = false;
+        int new_status;
+        if (toReg.ready && toReg.rd == rs && regStatus[toReg.rd] == toReg.robId){
+            new_status = -1;
+            revised = true;
+        }
+        if (toRegSta.ready && toRegSta.rd == rs) {
+            new_status = toRegSta.robId;
+            revised = true;
+        }
+        if (revised) return new_status;
         return regStatus[rs];
     }
 
-    void RegisterFile::execute(RoB2Reg &toReg, RoB2RegStatus &toRegSta) {
+    void RegisterFile::execute(RoB2Reg &toReg, Decoder2RegStatus &toRegSta, bool isFlush) {
+        if (isFlush) {
+            flush();
+            return;
+        }
         if (toReg.ready) {
             store_reg(toReg.rd, toReg.value, toReg.robId);
         }
@@ -42,6 +55,11 @@ namespace riscv {
             regs[i] = regs_next[i];
             regStatus[i] = regStatus_next[i];
         }
+    }
+
+    void RegisterFile::flush() {
+        for (int i = 0; i < 32; ++i)
+            regStatus_next[i] = -1;
     }
 
 } // riscv

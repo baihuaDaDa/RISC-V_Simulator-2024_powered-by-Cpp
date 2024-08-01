@@ -16,6 +16,8 @@ namespace riscv {
         ui clock = 0;
         std::unordered_map<ui, unsigned char> memory;
         MemResult result_next;
+        RoB2Mem fromRoB_tmp;
+        LB2Mem fromLSB_tmp;
 
     private:
         void load_byte(LB2Mem &fromLSB);
@@ -46,6 +48,8 @@ namespace riscv {
         void next();
 
         void flush();
+
+        bool is_busy(RoB2Mem &fromRoB, LB2Mem &fromLSB) const;
 
     };
 }

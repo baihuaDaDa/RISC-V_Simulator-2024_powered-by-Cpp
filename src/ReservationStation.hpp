@@ -43,7 +43,7 @@ namespace riscv {
 
         void flush();
 
-        bool full() const;
+        bool full(Decoder2RS &toRS) const;
 
     };
 

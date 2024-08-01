@@ -98,10 +98,16 @@ namespace riscv {
         Rob_EXIT
     };
 
+    enum RoBState {
+        EXECUTE,
+        WRITE_RESULT,
+        COMMIT
+    };
+
     // CU output
     struct CU2Decoder {
         Operation op;
-        ui rs1, rs2, rd, imm, instrAddr, age;
+        ui rs1, rs2, rd, imm, instrAddr, age, jumpAddr;
         bool isJump = false;
         bool ready = false;
     };
@@ -110,6 +116,7 @@ namespace riscv {
     struct Decoder2RoB {
         RoBType robType;
         ui dest, value, instrAddr, jumpAddr;
+        RoBState state;
         bool isJump = false;
         bool ready = false;
     };
@@ -125,8 +132,13 @@ namespace riscv {
     struct Decoder2LSB {
         MemType memType;
         int Qj, Qk;
-        ui Vj, Vk, imm, dest;
+        ui Vj, Vk, imm;
         ui robId, age;
+        bool ready = false;
+    };
+
+    struct Decoder2RegStatus {
+        ui rd, robId;
         bool ready = false;
     };
 
@@ -137,11 +149,6 @@ namespace riscv {
 
     struct RoB2Reg {
         ui rd, value, robId;
-        bool ready = false;
-    };
-
-    struct RoB2RegStatus {
-        ui rd, robId;
         bool ready = false;
     };
 
@@ -165,7 +172,7 @@ namespace riscv {
 
     // LSB output
     struct SB2RoB {
-        ui robId, value;
+        ui robId, dest, value;
         bool ready = false;
     };
 

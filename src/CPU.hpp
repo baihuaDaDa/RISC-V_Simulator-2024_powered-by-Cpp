@@ -1,6 +1,7 @@
 #ifndef RISC_V_SIMULATE_CPU_HPP
 #define RISC_V_SIMULATE_CPU_HPP
 
+#include <cstdint>
 #include "ControlUnit.hpp"
 #include "Decoder.hpp"
 #include "ALU.hpp"
