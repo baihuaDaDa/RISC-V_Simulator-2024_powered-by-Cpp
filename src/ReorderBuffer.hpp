@@ -37,15 +37,19 @@ namespace riscv {
         RoB2Mem toMem;
         RoB2SB toSB;
         RoB2CU toCU;
+        RoB2Predictor toPred;
         bool isFlush = false;
         bool exit = false;
         ui commitCnt = 0;
+        ui branchCnt = 0;
+        ui failureCnt = 0;
     private:
         LoopQueue<RoBEntry, kBufferCapBin> buffer_next;
         RoB2Reg toReg_next;
         RoB2Mem toMem_next;
         RoB2SB toSB_next;
         RoB2CU toCU_next;
+        RoB2Predictor toPred_next;
         bool isFlush_next = false;
 
     private:

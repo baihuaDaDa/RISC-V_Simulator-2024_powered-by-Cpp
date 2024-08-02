@@ -67,7 +67,10 @@ namespace riscv {
                     }
                     break;
                 case RoB_BRANCH:
+                    toPred_next = {top.instrAddr, bool(top.value), true};
+                    ++branchCnt;
                     if (top.value != top.isJump) {
+                        ++failureCnt;
                         isFlush_next = true;
                         toCU_next.jumpAddr = top.value ? top.jumpAddr : top.instrAddr + 4;
                     }
@@ -96,6 +99,8 @@ namespace riscv {
         isFlush = isFlush_next;
         isFlush_next = false;
         toCU = toCU_next;
+        toPred = toPred_next;
+        toPred_next.ready = false;
     }
 
     ui ReorderBuffer::next_rob_id(Decoder2RoB &toRoB) const {

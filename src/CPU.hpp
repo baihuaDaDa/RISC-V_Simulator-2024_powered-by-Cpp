@@ -5,6 +5,7 @@
 #include "ControlUnit.hpp"
 #include "Decoder.hpp"
 #include "ALU.hpp"
+#include "Predictor.hpp"
 
 namespace riscv {
 
@@ -14,6 +15,7 @@ namespace riscv {
         ControlUnit cu;
         Decoder dec;
         Memory *mem = new(Memory);
+        Predictor pred;
         RegisterFile regFile;
         ReservationStation rs;
         ReorderBuffer rob;

@@ -147,6 +147,12 @@ namespace riscv {
         ui jumpAddr;
     };
 
+    struct RoB2Predictor {
+        ui instrAddr;
+        bool isJump;
+        bool ready = false;
+    };
+
     struct RoB2Reg {
         ui rd, value, robId;
         bool ready = false;

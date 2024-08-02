@@ -117,7 +117,9 @@ namespace riscv {
             toDec.jumpAddr = pc_next = toDec.imm + mem.load_instruction(toDec.rs1);
         } else if (toDec.op == BEQ || toDec.op == BNE || toDec.op == BLT || toDec.op == BGE
                    || toDec.op == BLTU || toDec.op == BGEU) {
-            if (isJump) toDec.jumpAddr = pc_next = pc + toDec.imm;
+            toDec.jumpAddr = pc + toDec.imm;
+            if (isJump) pc_next = toDec.jumpAddr;
+            else pc_next = pc + 4;
         } else {
             pc_next = pc + 4;
         }

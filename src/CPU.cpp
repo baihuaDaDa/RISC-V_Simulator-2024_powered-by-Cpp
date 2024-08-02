@@ -6,7 +6,11 @@ namespace riscv {
 
     ui CPU::run() {
         while (true) {
-            if (rob.exit) return (std::uint8_t)(regFile.load_reg(10, rob.toReg));
+            if (rob.exit) {
+//                std::cout << "Clock: " << clock << "; CommitCnt: " << rob.commitCnt << std::endl;
+//                std::cout << "Failure rate of branch prediction: " << double(rob.failureCnt) / double(rob.branchCnt) << std::endl;
+                return (std::uint8_t)(regFile.load_reg(10, rob.toReg));
+            }
             ++clock;
 //            std::cerr << "Clock: " << std::dec << clock << std::hex << std::endl;
             execute();
@@ -17,8 +21,9 @@ namespace riscv {
 
     void CPU::execute() {
         /* one single module */
+        pred.update(rob.toPred);
 //        std::cerr << "isFull: " << dec.isFull << std::endl;
-        cu.execute(*mem, rob.isFlush, rob.toCU, true, dec.isFull);
+        cu.execute(*mem, rob.isFlush, rob.toCU, pred.predict(cu.pc), dec.isFull);
 //        std::cerr << "CU: " << cu.pc << " " << cu.toDec.op << std::endl;
         dec.execute(cu.toDec, rob, regFile, rs, lsb, alu.result, mem->result, lsb.toRoB, rob.isFlush);
         /* one single module */
