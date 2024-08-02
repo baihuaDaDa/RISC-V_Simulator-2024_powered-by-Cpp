@@ -50,7 +50,7 @@ namespace riscv {
 
     class LoadStoreBuffer {
     private:
-        static constexpr ui kBufferCapBin = 6;
+        static constexpr ui kBufferCapBin = 2;
         static constexpr ui kBufferSize = (1 << kBufferCapBin) - 1;
         LoopQueue<SBEntry, kBufferCapBin> storeBuffer_next;
         std::array<LBEntry, kBufferSize> loadBuffer_next;

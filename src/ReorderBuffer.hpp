@@ -29,7 +29,7 @@ namespace riscv {
 
     class ReorderBuffer {
     private:
-        static constexpr ui kBufferCapBin = 6;
+        static constexpr ui kBufferCapBin = 2;
         static constexpr ui kBufferSize = (1 << kBufferCapBin) - 1; // 循环队列capacity比实际空间少1
     public:
         LoopQueue<RoBEntry, kBufferCapBin> buffer;
