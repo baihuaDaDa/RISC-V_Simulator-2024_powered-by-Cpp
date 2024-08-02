@@ -18,12 +18,12 @@ namespace riscv {
 
     void ReservationStation::update_dependency(ui value, ui robId) {
         for (int i = 0; i < kStationSize; i++) {
-            if (station[i].busy) {
-                if (station[i].Qj == robId) {
+            if (station_next[i].busy) {
+                if (station_next[i].Qj == robId) {
                     station_next[i].Vj = value;
                     station_next[i].Qj = -1;
                 }
-                if (station[i].Qk == robId) {
+                if (station_next[i].Qk == robId) {
                     station_next[i].Vk = value;
                     station_next[i].Qk = -1;
                 }

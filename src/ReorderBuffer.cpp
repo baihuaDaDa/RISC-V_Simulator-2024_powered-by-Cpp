@@ -5,7 +5,7 @@ namespace riscv {
     ReorderBuffer::ReorderBuffer() = default;
 
     bool ReorderBuffer::full(Decoder2RoB &toRoB) const {
-        std::cerr << buffer.size() << ' ' << toRoB.ready << std::endl;
+//        std::cerr << buffer.size() << ' ' << toRoB.ready << std::endl;
         return buffer.size() + toRoB.ready >= kBufferSize;
     }
 
@@ -69,15 +69,15 @@ namespace riscv {
                 case RoB_BRANCH:
                     if (top.value != top.isJump) {
                         isFlush_next = true;
-                        toCU_next.jumpAddr = top.value ? top.instrAddr + 4 : top.jumpAddr;
+                        toCU_next.jumpAddr = top.value ? top.jumpAddr : top.instrAddr + 4;
                     }
                     break;
                 case Rob_EXIT:
                     exit = true;
                     break;
             }
-            if (!memBusy) {
-                std::cerr << "commit " << top.instrAddr << std::endl;
+            if (!memBusy || (top.robType != RoB_STORE_BYTE && top.robType != RoB_STORE_HALF && top.robType != RoB_STORE_WORD)) {
+//                std::cerr << "commit " << top.instrAddr << std::endl;
                 buffer_next.pop_front();
                 ++commitCnt;
             }
@@ -102,7 +102,7 @@ namespace riscv {
     }
 
     FindResult ReorderBuffer::find_value(ui robId, Decoder2RoB &fromDec, ALUResult &fromALU, MemResult &fromMem, SB2RoB &fromSB) const {
-        if (fromDec.ready && fromDec.state == WRITE_RESULT && buffer.back_identity() + 1 == robId) return {fromDec.value, true};
+        if (fromDec.ready && ((buffer.back_identity() + 1) & kBufferSize) == robId) return {fromDec.value, fromDec.state == WRITE_RESULT};
         if (fromALU.ready && fromALU.robId == robId) return {fromALU.value, true};
         if (fromMem.ready && fromMem.robId == robId) return {fromMem.value, true};
         if (fromSB.ready && fromSB.robId == robId) return {fromSB.value, true};

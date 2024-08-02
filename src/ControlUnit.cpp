@@ -30,7 +30,7 @@ namespace riscv {
                 toDec.op = JAL;
                 break;
             case 0b1100111: // jalr
-                toDec.imm = sext((ir & kImm_31_20), 11);
+                toDec.imm = sext((ir & kImm_31_20) >> 20, 11);
                 toDec.op = JALR;
                 break;
             case 0b1100011: // branch

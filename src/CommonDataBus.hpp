@@ -58,8 +58,8 @@ namespace riscv {
         CALC_SEQ,
         CALC_SNE,
         CALC_SLT,
-        CALC_SLTU,
         CALC_SGE,
+        CALC_SLTU,
         CALC_SGEU
     };
 

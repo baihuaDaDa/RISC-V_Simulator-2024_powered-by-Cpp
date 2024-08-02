@@ -20,19 +20,19 @@ namespace riscv {
 
     void LoadStoreBuffer::update_dependency(ui value, ui robId) {
         for (int i = 0; i < kBufferSize; ++i) {
-            if (loadBuffer[i].busy) {
-                if (loadBuffer[i].Qj == robId) {
+            if (loadBuffer_next[i].busy) {
+                if (loadBuffer_next[i].Qj == robId) {
                     loadBuffer_next[i].Vj = value;
                     loadBuffer_next[i].Qj = -1;
                 }
             }
         }
-        for (int i = 0; i < storeBuffer.size(); ++i) {
-            if (storeBuffer[i].Qj == robId) {
+        for (int i = 0; i < storeBuffer_next.size(); ++i) {
+            if (storeBuffer_next[i].Qj == robId) {
                 storeBuffer_next[i].Vj = value;
                 storeBuffer_next[i].Qj = -1;
             }
-            if (storeBuffer[i].Qk == robId) {
+            if (storeBuffer_next[i].Qk == robId) {
                 storeBuffer_next[i].Vk = value;
                 storeBuffer_next[i].Qk = -1;
             }
@@ -66,6 +66,7 @@ namespace riscv {
                 if (loadEntry.busy && loadEntry.Qj == -1 && (storeBuffer.empty() || (!storeBuffer.empty() && loadEntry.age < storeBuffer.front().age))) {
                     toMem_next = {loadEntry.loadType, loadEntry.Vj + loadEntry.Vk, loadEntry.robId, true};
                     loadBuffer_next[i].busy = false;
+                    break;
                 }
             }
         }
