@@ -18,11 +18,13 @@ namespace riscv {
     }
 
     ui RegisterFile::load_reg(ui rs, RoB2Reg &toReg) {
+        if (rs == 0) return 0;
         if (toReg.ready && toReg.rd == rs) return toReg.value;
         return regs[rs];
     }
 
     int RegisterFile::get_dependency(ui rs, RoB2Reg &toReg, Decoder2RegStatus &toRegSta) {
+        if (rs == 0) return -1;
         bool revised = false;
         int new_status;
         if (toReg.ready && toReg.rd == rs && regStatus[toReg.rd] == toReg.robId){

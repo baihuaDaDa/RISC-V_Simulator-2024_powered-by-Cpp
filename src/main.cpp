@@ -1,8 +1,8 @@
 #include "CPU.hpp"
 
 int main() {
-//    freopen("../testcases/bulgarian.data", "r", stdin);
-    freopen("../bulgarian.out", "w", stderr);
+//    freopen("../testcases/basicopt1.data", "r", stdin);
+    freopen("../basicopt1.out", "w", stderr);
     std::cerr << std::hex;
     riscv::Memory memory;
     riscv::CPU cpu(&memory);
