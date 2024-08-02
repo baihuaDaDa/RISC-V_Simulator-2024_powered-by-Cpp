@@ -1,8 +1,10 @@
 #ifndef RISC_V_SIMULATOR_REORDERBUFFER_HPP
 #define RISC_V_SIMULATOR_REORDERBUFFER_HPP
 
+#include <iomanip>
 #include "../utility/LoopQueue.hpp"
 #include "CommonDataBus.hpp"
+#include "RegisterFile.hpp"
 
 namespace riscv {
 
@@ -27,7 +29,7 @@ namespace riscv {
 
     class ReorderBuffer {
     private:
-        static constexpr ui kBufferCapBin = 5;
+        static constexpr ui kBufferCapBin = 6;
         static constexpr ui kBufferSize = (1 << kBufferCapBin) - 1; // 循环队列capacity比实际空间少1
     public:
         LoopQueue<RoBEntry, kBufferCapBin> buffer;
@@ -62,11 +64,18 @@ namespace riscv {
 
         FindResult find_value(ui robId, Decoder2RoB &fromDec, ALUResult &fromALU, MemResult &fromMem, SB2RoB &fromSB) const;
 
-        void execute(Decoder2RoB &toRoB, ALUResult &fromALU, MemResult &fromMem, SB2RoB &fromSB, bool memBusy);
+        void execute(Decoder2RoB &toRoB, ALUResult &fromALU, MemResult &fromMem, SB2RoB &fromSB, bool memBusy, RegisterFile &regFile);
 
         void next();
 
         void flush();
+
+        void print(RegisterFile &regFile) {
+            for (int i = 0; i < 32; i++) {
+                std::cerr << "x" << i << "=" << std::hex << std::uppercase << std::setw(8) << std::setfill('0') << regFile.load_reg(i, toReg)
+                           << std::endl;
+            }
+        }
 
     };
 

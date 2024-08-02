@@ -22,7 +22,7 @@ namespace riscv {
 
     class ReservationStation {
     private:
-        static constexpr ui kStationSize = 15;
+        static constexpr ui kStationSize = 63;
         std::array<RSEntry, kStationSize> station_next;
         RS2ALU toALU_next;
     public:

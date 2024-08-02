@@ -25,7 +25,7 @@ namespace riscv {
         buffer_next.at(robId).state = WRITE_RESULT;
     }
 
-    void ReorderBuffer::execute(Decoder2RoB &toRoB, ALUResult &fromALU, MemResult &fromMem, SB2RoB &fromSB, bool memBusy) {
+    void ReorderBuffer::execute(Decoder2RoB &toRoB, ALUResult &fromALU, MemResult &fromMem, SB2RoB &fromSB, bool memBusy, RegisterFile &regFile) {
         if (isFlush) {
             flush();
             return;
@@ -77,9 +77,10 @@ namespace riscv {
                     break;
             }
             if (!memBusy || (top.robType != RoB_STORE_BYTE && top.robType != RoB_STORE_HALF && top.robType != RoB_STORE_WORD)) {
-//                std::cerr << "commit " << top.instrAddr << std::endl;
+//                print(regFile);
+//                std::cerr << "executing ins count: " << std::dec << ++commitCnt << " PC= " << std::hex << std::uppercase << top.instrAddr << std::endl;
+//                std::cerr << std::endl;
                 buffer_next.pop_front();
-                ++commitCnt;
             }
         }
     }
