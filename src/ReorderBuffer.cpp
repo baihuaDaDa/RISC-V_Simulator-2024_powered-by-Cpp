@@ -80,9 +80,9 @@ namespace riscv {
                     break;
             }
             if (!memBusy || (top.robType != RoB_STORE_BYTE && top.robType != RoB_STORE_HALF && top.robType != RoB_STORE_WORD)) {
-                print(regFile);
-                std::cerr << "executing ins count: " << std::dec << ++commitCnt << " PC= " << std::hex << std::uppercase << top.instrAddr << std::endl;
-                std::cerr << std::endl;
+//                print(regFile);
+//                std::cerr << "executing ins count: " << std::dec << ++commitCnt << " PC= " << std::hex << std::uppercase << top.instrAddr << std::endl;
+//                std::cerr << std::endl;
                 buffer_next.pop_front();
             }
         }
