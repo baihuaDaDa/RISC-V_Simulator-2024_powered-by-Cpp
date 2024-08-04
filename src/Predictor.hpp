@@ -17,19 +17,17 @@ namespace riscv {
 
         void update(RoB2Predictor &toPred) {
             if (toPred.ready) {
-                ui ind = toPred.instrAddr & kMod;
-                if (toPred.isJump) {
+                ui ind = (toPred.instrAddr >> 2) & kMod;
+                if (toPred.isJump && counter[ind] != 3) {
                     ++counter[ind];
-                    counter[ind] &= 3;
-                } else {
-                    if (counter[ind] == 0) counter[ind] = 3;
-                    else --counter[ind];
+                } else if (!toPred.isJump && counter[ind] != 0) {
+                    --counter[ind];
                 }
             }
         }
 
         bool predict(ui pc) {
-            return counter[pc & kMod] > 1;
+            return counter[(pc >> 2) & kMod] > 1;
         }
 
     };
