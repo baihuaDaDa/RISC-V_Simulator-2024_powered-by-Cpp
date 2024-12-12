@@ -1,7 +1,8 @@
 #include "ControlUnit.hpp"
+#include "RegisterFile.hpp"
 
 namespace riscv {
-    void ControlUnit::execute(Memory &mem, bool isFlush, RoB2CU &fromRoB, bool isJump, bool isFull) {
+    void ControlUnit::execute(Memory &mem, RegisterFile &rf, bool isFlush, RoB2CU &fromRoB, bool isJump, bool isFull) {
         if (isFlush) {
             pc_next = fromRoB.jumpAddr;
             exit = false;
@@ -114,7 +115,9 @@ namespace riscv {
         if (toDec.op == JAL) {
             toDec.jumpAddr = pc_next = pc + toDec.imm;
         } else if (toDec.op == JALR) {
-            toDec.jumpAddr = pc_next = toDec.imm + mem.load_instruction(toDec.rs1);
+            RoB2Reg tmp;
+            tmp.ready = false;
+            toDec.jumpAddr = pc_next = toDec.imm + rf.load_reg(toDec.rs1, tmp);
         } else if (toDec.op == BEQ || toDec.op == BNE || toDec.op == BLT || toDec.op == BGE
                    || toDec.op == BLTU || toDec.op == BGEU) {
             toDec.jumpAddr = pc + toDec.imm;

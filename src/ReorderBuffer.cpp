@@ -25,7 +25,7 @@ namespace riscv {
         buffer_next.at(robId).state = WRITE_RESULT;
     }
 
-    void ReorderBuffer::execute(Decoder2RoB &toRoB, ALUResult &fromALU, MemResult &fromMem, SB2RoB &fromSB, bool memBusy, RegisterFile &regFile) {
+    void ReorderBuffer::execute(Decoder2RoB &toRoB, ALUResult &fromALU, MemResult &fromMem, SB2RoB &fromSB, bool memBusy) {
         if (isFlush) {
             flush();
             return;

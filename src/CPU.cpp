@@ -23,12 +23,12 @@ namespace riscv {
         /* one single module */
         pred.update(rob.toPred);
 //        std::cerr << "isFull: " << dec.isFull << std::endl;
-        cu.execute(*mem, rob.isFlush, rob.toCU, pred.predict(cu.pc), dec.isFull);
+        cu.execute(*mem, regFile, rob.isFlush, rob.toCU, pred.predict(cu.pc), dec.isFull);
 //        std::cerr << "CU: " << cu.pc << " " << cu.toDec.op << std::endl;
         dec.execute(cu.toDec, rob, regFile, rs, lsb, alu.result, mem->result, lsb.toRoB, rob.isFlush);
         /* one single module */
 //        std::cerr << "toRoB: " << dec.toRoB.robType << " " << dec.toRoB.instrAddr << " " << dec.toRoB.ready << std::endl;
-        rob.execute(dec.toRoB, alu.result, mem->result, lsb.toRoB, mem->is_busy(rob.toMem, lsb.toMem), regFile);
+        rob.execute(dec.toRoB, alu.result, mem->result, lsb.toRoB, mem->is_busy(rob.toMem, lsb.toMem));
         rs.execute(dec.toRS, alu.result, mem->result, rob.isFlush);
         alu.execute(rs.toALU, rob.isFlush);
         lsb.execute(dec.toLSB, alu.result, mem->result, rob.toSB, mem->is_busy(rob.toMem, lsb.toMem), rob.isFlush);

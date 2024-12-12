@@ -3,6 +3,7 @@
 
 #include "../utility/utils.hpp"
 #include "Memory.hpp"
+#include "RegisterFile.hpp"
 
 namespace riscv {
 
@@ -33,7 +34,7 @@ namespace riscv {
 
         void next();
 
-        void execute(Memory &mem, bool isFlush, RoB2CU &fromRoB, bool isJump, bool isFull);
+        void execute(Memory &mem, RegisterFile &rf, bool isFlush, RoB2CU &fromRoB, bool isJump, bool isFull);
 
     };
 

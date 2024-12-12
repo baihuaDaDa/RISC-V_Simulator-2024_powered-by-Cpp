@@ -70,8 +70,7 @@ namespace riscv {
             toRegSta_next = {toDecoder.rd, rob.next_rob_id(toRoB), true};
             isFull_next = false;
             toDecoder.ready = false;
-        }
-        else isFull_next = true;
+        } else isFull_next = true;
     }
 
     void Decoder::func_auipc(CU2Decoder &toDecoder, ReorderBuffer &rob, RegisterFile &regFile, ReservationStation &rs, LoadStoreBuffer &lsb, ALUResult &fromALU, MemResult &fromMem, SB2RoB &fromSB) {
