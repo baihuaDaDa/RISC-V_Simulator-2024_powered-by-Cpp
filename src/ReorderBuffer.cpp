@@ -112,7 +112,7 @@ namespace riscv {
         if (fromDec.ready && ((buffer.back_identity() + 1) & kBufferSize) == robId) return {fromDec.value, fromDec.state == WRITE_RESULT};
         if (fromALU.ready && fromALU.robId == robId) return {fromALU.value, true};
         if (fromMem.ready && fromMem.robId == robId) return {fromMem.value, true};
-        if (fromSB.ready && fromSB.robId == robId) return {fromSB.value, true};
+//        if (fromSB.ready && fromSB.robId == robId) return {fromSB.value, true};
         return {buffer.at(robId).value, buffer.at(robId).state == WRITE_RESULT};
     }
 
