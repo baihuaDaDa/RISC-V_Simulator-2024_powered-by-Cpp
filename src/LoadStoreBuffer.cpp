@@ -53,7 +53,7 @@ namespace riscv {
             if (storeEntry.robId != fromRoB.robId) throw "wrong store entry.";
             storeBuffer_next.pop_front();
         }
-        if (!storeBuffer.empty()) {
+        if (!storeBuffer.empty() && !fromRoB.ready) {
             auto &storeEntry = storeBuffer.front();
             if (storeEntry.Qj == -1 && storeEntry.Qk == -1) {
                 toRoB_next = {storeEntry.robId, storeEntry.Vj + storeEntry.imm, storeEntry.Vk, true};
